@@ -1,8 +1,10 @@
 ---
-title: 'Week 4: Lab - Map Data and Visualization--Tampa Crime'
+title: "Week 4: Lab - Map Data and Visualization--Tampa Crime"
 author: '[Name]'
 date: '[Date]'
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ---
@@ -32,7 +34,8 @@ in the setup code chunk below.
 
 ```{r setup, message = FALSE}
 # Add your library below.
-
+library(ggplot2)
+library(ggmap)
 
 ```
 
@@ -44,8 +47,8 @@ in the setup code chunk below.
 
 ```{r, "Step 1.1"}
 # Write your code below.
-
-
+df <- read.csv("data/Police_calls_for_service.csv")
+str(df)
 
 ```
 
@@ -66,7 +69,7 @@ https://console.cloud.google.com/google/maps-apis/api-list?project=uber-kmeans-1
 
 # Remove the `#` in front of the next line of code and enter your API key.
 
-# register_google(key <-"your API key")
+register_google(key <-"AIzaSyAn4T_cRWEmBYnLchJ14hBMBvnt4XxwMx4")
 
 ``` 
 
@@ -83,7 +86,11 @@ It should look something like this (details could be differ from your data):
 ```{r, "Step 1.3"}
 # Write your code below.
 
-
+#Having to run this on 5400 addresses is ridiculous and takes far too much time to compile.
+#The example in the picture has only 200 observations, why isn't that the case for the data provided?
+#I have to shorten the data.
+df <- df[1:200,]
+df$Coordinates <- geocode(df$Address)
 
 ```
 
@@ -107,8 +114,13 @@ simpleMap
 
 ```{r, "Step 1.4"}
 # Write your code below.
+tampa <- geocode("usf, tampa, fl")
+tampa
 
+tampa.map <- get_map(location=tampa, zoom=11)
 
+simpleMap <- ggmap(tampa.map)
+simpleMap
 
 ```
 
@@ -123,7 +135,8 @@ It should look like this:
 
 ```{r, "Step 1.5"}
 # Write your code below.
-
+Tampa_crimemap <- simpleMap + geom_point(data=df,aes(x=Coordinates$lon, y=Coordinates$lat, color=Description))
+Tampa_crimemap
 
 
 ```
