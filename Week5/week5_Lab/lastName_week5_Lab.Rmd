@@ -1,0 +1,98 @@
+---
+title: "Week 5: Lab - Word Cloud Chapter Challenge"
+author: "Tristan Wijnmaalen"
+date: "2/12/2023"
+output:
+  html_document: default
+  word_document: default
+---
+
+---
+
+# Instructions
+Create a word cloud using the `text` column from a real twitter dataset 
+(sample.csv).
+
+---
+
+```{r setup, message = FALSE}
+# Add your library below. Add wordcould2 in the library for fun and try out with wordcloud2 when producing wordclouds below.
+library(wordcloud)
+library(wordcloud2)
+library(tm)
+
+```
+
+# Step 1. Load and Clean the Data
+Load in the `sample.csv` dataset from this project's data folder. Investigate the data structure, and read in "relevant" data for a text analysis. 
+Please make sure you transform the document to lowercase, delete stopwords & numbers & punctuation (1 point).
+
+```{r, "Step 1"}
+# Write your code below. 
+df <- read.csv("data/sample.csv", stringsAsFactors = F)
+words.corpus <- Corpus(VectorSource(df$text))
+words.corpus <- tm_map(words.corpus, removeNumbers)
+words.corpus <- tm_map(words.corpus, removePunctuation)
+words.corpus <- tm_map(words.corpus, stripWhitespace)
+words.corpus <- tm_map(words.corpus, content_transformer(tolower))
+words.corpus <- tm_map(words.corpus, removeWords, stopwords("english"))
+
+```
+
+---
+
+# Step 2. Adjust the Stopwords
+Add "can" and "just" to the stopwords list, then select/add two more stopwords of your choice. Write your rationale for choosing these two stopwords. You may need to this step after looking at the first word cloud results (1 point). 
+
+```{r, "Step 2"}
+# Write your code below.
+words.corpus <- tm_map(words.corpus, removeWords, words = c("can","just","virginamerica","like"))
+#I removed 'virginamerica' since it's in every single tweet due to that being the account everyone is replying to. 
+#I removed 'like' because it's an uninformative filler word.
+
+```
+
+---
+
+# Step 3. Adjust the Theme
+Use five colors and "Dark2" for color theme. If you use the data as is, it will only show three colors. Use available attributes and data manipulation to show all five colors instead of three. Produce a similar graph using wordcloud2 (1 point).
+
+```{r, "Step 3"}
+# Write your code below.
+words.dtm <- TermDocumentMatrix(words.corpus)
+words.matrix <- as.matrix(words.dtm)
+wordcount <- sort(rowSums(words.matrix),decreasing=T)
+df2 <- data.frame(word = names(wordcount),freq=wordcount)
+
+set.seed(1337)
+
+wordcloud(words = df2$word, freq = df2$freq, min.freq = 5, max.words = 200, random.order = F, rot.per=0.35, colors=brewer.pal(5, "Dark2"))
+wordcloud2(data=df2, size=1, color='random-light', backgroundColor="black", shape = 'star')
+```
+
+---
+
+# Step 4. Analysis
+Does the word cloud convey the key points of the document? (1 point). Critical thinking is important. Investigate the raw data (word distribution, sentiment analysis results), does the current word cloud really convey the key points of the raw data? If not, how would you improve the process to produce better results so that the results could be more meaningful to the company? Did you try everything to improve the meanings of the word cloud?
+
+
+> Yes, the word cloud does convey the key points of the document which are tweets pertaining to general troubleshooting and reviews
+by customers from virgin america.
+
+---
+
+# Step 5. Compile
+Submit the compiled file. 
+The wordcloud may prevent you from compiling. If so, do the following: 
+
+```
+jpeg('p1.jpg')  
+wordcloud(cloudFrame.t$word, cloudFrame.t$freq)  
+dev.off()
+```
+This will make the graphs save in the current working directory. 
+
+```{r, "Step 5"}
+# Write your code below, if necessary.
+
+```
