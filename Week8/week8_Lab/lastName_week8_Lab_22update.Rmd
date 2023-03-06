@@ -1,0 +1,191 @@
+---
+title: 'Week 8: Lab - Linear Modeling (Making Predictions)'
+author: 'Tristan Wijnmaalen'
+date: '03/05/2023'
+output: html_document
+---
+
+---
+
+# Instructions
+The textbook’s chapter on linear models (“Line Up, Please”) introduces 
+**linear predictive modeling** using the workhorse tool known as 
+**multiple regression**. The term “multiple regression” has an odd history, 
+dating back to an early scientific observation of a phenomenon called 
+**“regression to the mean”**. These days, multiple regression is just an 
+interesting name for using a simple linear modeling technique to measuring the 
+connection between one or more **predictor variables** and an **outcome variable**. 
+
+In this exercise, we are going to use an open dataset to explore antelope population.
+
+This is the first exercise of the semester where there is no sample R code to 
+help you along. Because you have had so much practice with R by now, you can 
+create and/or find all of the code you need to accomplish these steps.
+
+---
+
+```{r setup, message = FALSE}
+# Add your library below.
+
+library(ggplot2)
+library(readxl)
+
+```
+
+
+# Step 1 - Define "Model"
+Write a definition of a model, based on how the author uses it in this chapter.
+
+> In Chapter 16, the definition of a model is a predictive instrument created from a statistical analysis process.
+
+
+---
+
+
+# Step 2 - Review the data 
+You can find the data from Cengage's website. 
+This URL will enable you to download the dataset into excel: 
+
+* http://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/mlr/excel/mlr01.xls
+
+The more general website can be found at:
+
+* http://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/mlr/frames/frame.html
+
+If you view this in a spreadsheet, you will find four columns of a small dataset:
+
+* The first column shows the number of fawn in a given spring (fawn are baby antelope). 
+* The second column shows the population of adult antelope.
+* The third shows the annual precipitation that year. 
+* And finally the last column shows how bad the winter was during that year.
+
+```{r, "Step 2"}
+# No code necessary; Just review the data.
+```
+
+---
+
+
+# Step 3 - Read in the data
+You have the option of saving the file to your computer and reading it into R, 
+or you can read the data directly from the web into a dataframe.
+
+```{r, "Step 3"}
+# Write your code below.
+myDF<-as.data.frame(readxl::read_excel("./data/mlr01.xls"))
+colnames(myDF) <- c("nFawn", "adultPop", "precip", "winter")
+
+```
+
+
+---
+
+
+# Step 4 - Inspect the data
+You should inspect the data using `str()` to make sure that 1) all the cases have
+been read in (n=8 years of observations) and 2) that there are four variables.
+
+```{r, "Step 4"}
+# Write your code below.
+str(myDF)
+
+```
+
+
+---
+
+
+# Step 5 - Create bivariate plots
+Create bivariate plots of the number of baby fawns versus adult antelope population,
+precipitation that year, and severity of the winter.  
+**Your code should produce three separate plots.** Make sure the y-axis and x-axis are labeled. 
+Keeping in mind that the number of fawns is the outcome (or dependent) variable, 
+which axis should it go on in your plots? You can also create scatter plots where 
+size and colors reflect the two variables you didn't use 
+(remember the visualization homework/lab. If you create these plots, you can earn extra 1 point).
+
+Question: which variable is the most highly correlated with Fawn Count?
+
+## Step 5.1 - Fawn Count by Adult Population
+```{r, "Step 5.1"}
+# Write your code below.
+ggplot(myDF, aes(x = nFawn, y = adultPop, size = precip, color = winter)) +
+  geom_point() +
+  scale_color_gradient(low = "orange", high = "blue") + #I like these colors, makes it look like a proper display of warmth
+  scale_size(range = c(4,10)) +
+  labs(x = "Number of Baby Fawns", y = "Adult Population", size = "Precipitation", color = "Winter Severity Index")
+
+```
+
+## Step 5.2 - Fawn Count by Annual Precipitation
+```{r, "Step 5.2"}
+# Write your code below.
+ggplot(myDF, aes(x = nFawn, y = precip, size = adultPop, color = winter)) +
+  geom_point() +
+  scale_color_gradient(low = "orange", high = "blue") +
+  scale_size(range = c(4,10)) +
+  labs(x = "Number of Baby Fawns", y = "Precipitation", size = "Adult Population", color = "Winter Severity Index")
+
+```
+
+## Step 5.3 - Fawn Count by Winter Severity Index
+```{r, "Step 5.3"}
+# Write your code below.
+ggplot(myDF, aes(x = nFawn, y = winter, size = adultPop, color = precip)) +
+  geom_point() +
+  scale_color_gradient(low = "grey", high = "blue") +
+  scale_size(range = c(4,10)) +
+  labs(x = "Number of Baby Fawns", y = "Winter Severity Index", size = "Adult Population", color = "Precipitation")
+
+```
+
+
+---
+
+
+# Step 6 - Create regression models 
+Create three regression models of increasing complexity using `lm()`, then
+analyze the results. Based on the knowledge you've accumulated from Step 5, develop models.
+
+* **Model one**: Fit the model to predict the number of fawns using the one variable you think is the most highly correlated with the outcome variable based on Step 5.
+* **Model two**: Fit the model to predict the number of fawns using two variables (choose one variable to add to the one variable you selected in Model one)
+* **Model three**: Fit the model to predict the number of fawns from all the three variables.  
+
+## Step 6.1 - Predict Fawn Count using one input variable
+```{r, "Step 6.1"}
+# Write your code below.
+lm(nFawn ~ adultPop, data = myDF)
+# The coefficient of adultPop is positive with a value of nearly 0.5. This means that for about every two adult deer, there is an increase of one fawn.
+```
+
+## Step 6.2 - Predict Fawn Count using two input variable
+```{r, "Step 6.2"}
+# Write your code below.
+lm(nFawn ~ adultPop + winter, data = myDF)
+# The winter coefficient implies that there is a positive relationship, but looking at the data brings me to a different conclusion. It seems as though only very severe winters have an impact, those with an index of 4 or more. You can see this easily on the scatter plot with winter severity as the y-axis. Even in an index 3 winter, there were lots of fawns due to a high adult population.
+
+```
+
+## Step 6.3 - Predict Fawn Count using three input variables
+```{r, "Step 6.3"}
+# Write your code below.
+lm(nFawn ~ adultPop + winter + precip, data = myDF)
+# Precipitation has a strong, direct positive correlation much like adult population, which is also backed up by the scatter plots. When these values were the y-axes, the chart trended consistently upwards, with a hiccup or two in precipitation.
+
+```
+
+## Step 6.4 - Analysis
+Which regression model works best? 
+Which of the predictors are statistically significant in each model? 
+If you wanted to create the most parsimonious model 
+(i.e., the one that did the best job with the fewest predictors), 
+what would it contain? ***You MUST answer these questions***.
+
+> I think the first model works the best, adding more seemed to muddy the water and make it tough to understand the most significant variable. The plots solidified adult population as the most significant variable, so I can tell when the regression models are a bit off. Despite adultPop being most important, all predictors were statistically significant in each model. I agree with this outcome because it's evident that winter still had an impact when it was extremely cold, as well as precipitation being undeniably essential for life. Considering all of this, I would use the model with only adultPop, like my first one. Each and every dot on the graph is higher than the one before it, making it the most accurate. A bad winter means less fawns make it to adulthood, same thing for a lack of rain. Less adults means less kids, that much is obvious. The adult population does a good enough job of representing the other variables that they could be cut out entirely.
+
+---
+
+
+# Step 7 - Upload the compiled file
+Please only include print outs of data sets using "head" function. 
+I will take points off if you include more than two pages of dataset print outs.
