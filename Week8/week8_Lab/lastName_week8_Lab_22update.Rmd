@@ -154,14 +154,16 @@ analyze the results. Based on the knowledge you've accumulated from Step 5, deve
 ## Step 6.1 - Predict Fawn Count using one input variable
 ```{r, "Step 6.1"}
 # Write your code below.
-lm(nFawn ~ adultPop, data = myDF)
+m1 <- plot(lm(nFawn ~ adultPop, data = myDF))
+abline(m1)
 # The coefficient of adultPop is positive with a value of nearly 0.5. This means that for about every two adult deer, there is an increase of one fawn.
 ```
 
 ## Step 6.2 - Predict Fawn Count using two input variable
 ```{r, "Step 6.2"}
 # Write your code below.
-lm(nFawn ~ adultPop + winter, data = myDF)
+m2 <- plot(lm(nFawn ~ adultPop + winter, data = myDF))
+abline(m2)
 # The winter coefficient implies that there is a positive relationship, but looking at the data brings me to a different conclusion. It seems as though only very severe winters have an impact, those with an index of 4 or more. You can see this easily on the scatter plot with winter severity as the y-axis. Even in an index 3 winter, there were lots of fawns due to a high adult population.
 
 ```
@@ -169,7 +171,8 @@ lm(nFawn ~ adultPop + winter, data = myDF)
 ## Step 6.3 - Predict Fawn Count using three input variables
 ```{r, "Step 6.3"}
 # Write your code below.
-lm(nFawn ~ adultPop + winter + precip, data = myDF)
+m3 <- plot(lm(nFawn ~ adultPop + winter + precip, data = myDF))
+abline(m3)
 # Precipitation has a strong, direct positive correlation much like adult population, which is also backed up by the scatter plots. When these values were the y-axes, the chart trended consistently upwards, with a hiccup or two in precipitation.
 
 ```
